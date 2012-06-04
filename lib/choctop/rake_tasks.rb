@@ -9,7 +9,7 @@ module ChocTop
       task "build/#{build_type}/#{target}/Contents/Info.plist" do
         make_build
       end
-      
+
       task :clean_build do
         FileUtils.rm_rf(build_path)
       end
@@ -17,7 +17,7 @@ module ChocTop
       desc "Create the dmg file for appcasting (`rake dmg`, or `rake dmg[automount]` to automatically mount the dmg)"
       task :dmg, :automount, :needs => :build do |t, args|
         args.with_defaults(:automount => false)
-        
+
         detach_dmg
         make_dmg
         detach_dmg

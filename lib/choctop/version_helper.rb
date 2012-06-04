@@ -2,7 +2,7 @@ module ChocTop
   class VersionHelper
     attr_accessor :info_plist_path
     attr_reader :major, :minor, :patch, :build
-  
+
     def initialize(info_plist_path)
       self.info_plist_path = info_plist_path
       parse_version
@@ -11,11 +11,11 @@ module ChocTop
         write
       end
     end
-  
+
     def info_plist
-      @info_plist ||= OSX::NSDictionary.dictionaryWithContentsOfFile(info_plist_path) || {}
+      @info_plist ||= NSDictionary.dictionaryWithContentsOfFile(info_plist_path) || {}
     end
-  
+
     def parse_version
       # http://rubular.com/regexes/10467 -> 3.5.4.a1
       # http://rubular.com/regexes/10468 -> 3.5.4
@@ -57,11 +57,11 @@ module ChocTop
       @patch = patch
       @build = build
     end
-  
+
     def write
       info_plist['CFBundleVersion'] =  to_s
       info_plist['CFBundleShortVersionString'] = to_s
-      info_plist.writeToFile_atomically(info_plist_path,true)
+      info_plist.writeToFile(info_plist_path, :atomically => true)
     end
 
     def to_s

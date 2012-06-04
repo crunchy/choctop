@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.authors = ["Dr Nic Williams", "Chris Bailey", "Patrick Huesler"]
   s.date = %q{2011-01-31}
   s.default_executable = %q{install_choctop}
-  s.description = %q{Build and deploy tools for Cocoa apps using Sparkle for distributions and upgrades; 
+  s.description = %q{Build and deploy tools for Cocoa apps using Sparkle for distributions and upgrades;
 it’s like Hoe but for Cocoa apps.
 
 Package up your OS X/Cocoa applications into Custom DMGs, generate Sparkle XML, and
@@ -48,30 +48,30 @@ All rake tasks:
       s.add_development_dependency(%q<hoe>, [">= 2.8.0"])
       s.add_runtime_dependency(%q<builder>, ["= 2.1.2"])
       s.add_runtime_dependency(%q<awesome_print>, ["= 0.2.1"])
-      s.add_runtime_dependency(%q<RedCloth>, ["= 4.2.3"])
+      # s.add_runtime_dependency(%q<RedCloth>, ["= 4.2.3"])
       s.add_runtime_dependency(%q<escape>, ["= 0.0.4"])
       s.add_runtime_dependency(%q<rubigen>, ["= 1.5.5"])
       s.add_development_dependency(%q<bundler>, [">= 0"])
       s.add_development_dependency(%q<rspec>, [">= 2.0.0.beta"])
-      s.add_development_dependency(%q<cucumber>, ["= 0.8.3"])
+      # s.add_development_dependency(%q<cucumber>, ["= 0.8.3"])
     else
       s.add_dependency(%q<hoe>, [">= 2.8.0"])
       s.add_dependency(%q<builder>, ["= 2.1.2"])
       s.add_dependency(%q<awesome_print>, ["= 0.2.1"])
-      s.add_dependency(%q<RedCloth>, ["= 4.2.3"])
+      # s.add_dependency(%q<RedCloth>, ["= 4.2.3"])
       s.add_dependency(%q<escape>, ["= 0.0.4"])
       s.add_dependency(%q<bundler>, [">= 0"])
       s.add_dependency(%q<rspec>, [">= 2.0.0.beta"])
-      s.add_dependency(%q<cucumber>, ["= 0.8.3"])
+      # s.add_dependency(%q<cucumber>, ["= 0.8.3"])
     end
   else
     s.add_dependency(%q<hoe>, [">= 2.8.0"])
     s.add_dependency(%q<builder>, ["= 2.1.2"])
     s.add_dependency(%q<awesome_print>, ["= 0.2.1"])
-    s.add_dependency(%q<RedCloth>, ["= 4.2.3"])
+    # s.add_dependency(%q<RedCloth>, ["= 4.2.3"])
     s.add_dependency(%q<escape>, ["= 0.0.4"])
     s.add_dependency(%q<bundler>, [">= 0"])
     s.add_dependency(%q<rspec>, [">= 2.0.0.beta"])
-    s.add_dependency(%q<cucumber>, ["= 0.8.3"])
+    # s.add_dependency(%q<cucumber>, ["= 0.8.3"])
   end
 end

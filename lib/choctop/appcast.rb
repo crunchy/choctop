@@ -4,7 +4,7 @@ module ChocTop
       if skip_xcode_build
         puts "Skipping build task..."
       else
-        sh "xcodebuild -configuration '#{build_type}' -target '#{build_target}' #{build_opts}"
+        system "xcodebuild -configuration '#{build_type}' -target '#{build_target}' #{build_opts}"
       end
     end
 
@@ -95,9 +95,9 @@ module ChocTop
       case transport
       when :scp
         # this is whack, really, work out your rsync options
-        sh %{scp #{scp_args} #{build_path}/* #{_user}#{_host}:#{remote_dir}}
+        system %{scp #{scp_args} #{build_path}/* #{_user}#{_host}:#{remote_dir}}
       else # default to rsync as per original
-        sh %{rsync #{rsync_args} #{build_path}/ #{_user}#{_host}:#{remote_dir}}
+        system %{rsync #{rsync_args} #{build_path}/ #{_user}#{_host}:#{remote_dir}}
       end
     end
 

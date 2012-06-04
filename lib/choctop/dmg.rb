@@ -1,11 +1,12 @@
 module ChocTop
   module Dmg
+
     def codesign_executable
-      sh "codesign -v -s '#{codesign_identity}' '#{build_products}/#{name}.app'"
+      system "codesign -v -s '#{codesign_identity}' '#{build_products}/#{name}.app'"
       # this next step just provides the new codesigning info for confirmation
-      sh "codesign -dv '#{build_products}/#{name}.app'"
+      system "codesign -dv '#{build_products}/#{name}.app'"
     end
-    
+
     def prepare_files
       self.files = files.inject({}) do |files, file|
         path_or_helper, options = file
@@ -18,11 +19,11 @@ module ChocTop
             path_or_helper
         end
         if path && File.exists?(path)
-          files[path] = options 
+          files[path] = options
           options[:name] ||= File.basename(path)
         end
         if path =~ %r{\.webloc$}
-          files[path] = options 
+          files[path] = options
           options[:name] ||= File.basename(path)
           options[:link] = true
         end
@@ -52,10 +53,10 @@ module ChocTop
       FileUtils.mkdir_p build_path
       FileUtils.mkdir_p mountpoint # TODO can we remove random mountpoints?
       FileUtils.rm_f(pkg) # make sure destination pkg doesn't already exist, or hdiutil will barf
-      sh "hdiutil create -format UDRW -quiet -volname '#{name}' -srcfolder '#{dmg_src_folder}' '#{pkg}'"
+      system "hdiutil create -format UDRW -quiet -volname '#{name}' -srcfolder '#{dmg_src_folder}' '#{pkg}'"
       mount_dmg
-      sh "bless --folder '#{volume_path}' --openfolder '#{volume_path}'"
-      sh "sleep 1"
+      system "bless --folder '#{volume_path}' --openfolder '#{volume_path}'"
+      system "sleep 1"
 
       puts "volume_icon: #{volume_icon.inspect}"
       puts "include_applications_icon?: #{include_applications_icon?.inspect}"
@@ -63,9 +64,9 @@ module ChocTop
       configure_applications_icon if include_applications_icon?
       configure_dmg_window
     end
-    
+
     def mount_dmg
-      sh "hdiutil attach '#{pkg}' -mountpoint '#{volume_path}' -noautoopen -quiet"
+      system "hdiutil attach '#{pkg}' -mountpoint '#{volume_path}' -noautoopen -quiet"
     end
 
     def volume_background
@@ -77,13 +78,13 @@ module ChocTop
     end
 
     def window_bounds
-      window_position + 
+      window_position +
       window_position.zip(background_bounds).map { |w, b| w + b }
     end
 
     def background_bounds
       return [400, 300] unless background_file
-      background = OSX::NSImage.alloc.initByReferencingFile(background_file).size.to_a
+      background = NSImage.alloc.initByReferencingFile(background_file).size.to_a
       [background.first, background.last + statusbar_height]
     end
 
@@ -92,7 +93,7 @@ module ChocTop
     def configure_volume_icon
       if volume_icon
         FileUtils.cp(volume_icon, "#{volume_path}/.VolumeIcon.icns")
-        sh "SetFile -a C '#{volume_path}'"
+        system "SetFile -a C '#{volume_path}'"
       end
     end
 
@@ -100,7 +101,7 @@ module ChocTop
       if background_file
         target_background = "#{volume_path}/#{volume_background}"
         FileUtils.mkdir_p(File.dirname(target_background))
-        FileUtils.cp(background_file, target_background) 
+        FileUtils.cp(background_file, target_background)
       end
       script = <<-SCRIPT.gsub(/^      /, '')
         tell application "Finder"
@@ -135,7 +136,7 @@ module ChocTop
       SCRIPT
       puts "script: #{script}"
       run_applescript(script)
-      sh "SetFile -a V '#{target_background}'" if background_file
+      system "SetFile -a V '#{target_background}'" if background_file
     end
 
     def set_position_of_files
@@ -170,9 +171,9 @@ module ChocTop
       SCRIPT
       if applications_icon
         applications_path = "#{volume_path}/Applications"
-        OSX::NSApplicationLoad()
-        image = OSX::NSImage.alloc.initWithContentsOfFile(applications_icon)
-        OSX::NSWorkspace.sharedWorkspace.setIcon_forFile_options(image, applications_path, nil)
+        NSApplicationLoad()
+        image = NSImage.alloc.initWithContentsOfFile(applications_icon)
+        NSWorkspace.sharedWorkspace.setIcon(image, :forFile => applications_path, options: 0)
       end
     end
 
@@ -180,7 +181,7 @@ module ChocTop
       mounted_paths = `hdiutil info | grep '#{volume_path}' | grep "Apple_HFS"`.split("\n").map { |e| e.split(" ").first }
       mounted_paths.each do |path|
         begin
-          sh "hdiutil detach '#{path}' -quiet -force"
+          system "hdiutil detach '#{path}' -quiet -force"
         rescue StandardError => e
           p e
         end
@@ -190,7 +191,7 @@ module ChocTop
     def convert_dmg_readonly
       tmp_path = "/tmp/rw.dmg"
       FileUtils.mv(pkg, tmp_path)
-      sh "hdiutil convert '#{tmp_path}' -format UDZO -imagekey zlib-level=9 -o '#{pkg}'"
+      system "hdiutil convert '#{tmp_path}' -format UDZO -imagekey zlib-level=9 -o '#{pkg}'"
     end
 
     def add_eula
@@ -199,15 +200,15 @@ module ChocTop
     	# /Developer/Tools/DeRez -useDF SLAResources.rsrc > build/temp/sla.r
     	# /Developer/Tools/Rez -a build/temp/sla.r -o $@
     	# hdiutil flatten $@
-	
+
     end
-    
+
     def add_file_to_dmg_src_folder(path, options)
       target = File.join(tmp_dmg_src_folder, options[:name])
-      sh ::Escape.shell_command(['cp', '-r', path, target])
+      system ::Escape.shell_command(['cp', '-r', path, target])
       if options[:exclude]
         exclude_list = options[:exclude].is_a?(Array) ? options[:exclude] : [options[:exclude].to_s]
-        exclude_list.each { |exclude| sh ::Escape.shell_command(['rm', '-rf', File.join(target, exclude)]) }
+        exclude_list.each { |exclude| system ::Escape.shell_command(['rm', '-rf', File.join(target, exclude)]) }
       end
     end
 
@@ -215,16 +216,16 @@ module ChocTop
       plist_name   = options[:name].gsub(/\.webloc$/, '')
       plist_target = File.join(tmp_dmg_src_folder, plist_name)
       target       = File.join(tmp_dmg_src_folder, options[:name])
-      sh ::Escape.shell_command(['defaults', 'write', plist_target, 'URL', options[:url]])
-      sh ::Escape.shell_command(['plutil', '-convert', 'xml1', '-o', target, "#{plist_target}.plist"])
-      sh ::Escape.shell_command(['rm', "#{plist_target}.plist"])
+      system ::Escape.shell_command(['defaults', 'write', plist_target, 'URL', options[:url]])
+      system ::Escape.shell_command(['plutil', '-convert', 'xml1', '-o', target, "#{plist_target}.plist"])
+      system ::Escape.shell_command(['rm', "#{plist_target}.plist"])
     end
-    
+
     def run_applescript(applescript, tmp_file = "choctop-script")
       File.open(scriptfile = "/tmp/#{tmp_file}", "w") do |f|
         f << applescript
       end
-      sh("osascript #{scriptfile}") do |ok, res|
+      system("osascript #{scriptfile}") do |ok, res|
         if ! ok
           p res
           puts volume_path
@@ -233,7 +234,7 @@ module ChocTop
       end
       applescript
     end
-    
+
     def tmp_dmg_src_folder
       @tmp_dmg_src_folder ||= begin
         require 'tmpdir'

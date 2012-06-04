@@ -10,6 +10,6 @@ h = Hoe.spec 'choctop' do
   developer 'Chris Bailey', 'chris@cobaltedge.com'
   developer 'Patrick Huesler', 'patrick.huesler@gmail.com'
 end
-h.spec.add_bundler_dependencies
+# h.spec.add_bundler_dependencies
 
 task :default => [:features, :spec]
