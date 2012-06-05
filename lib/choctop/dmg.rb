@@ -85,10 +85,8 @@ module ChocTop
     def background_bounds
       return [400, 300] unless background_file
       background = NSImage.alloc.initByReferencingFile(background_file).size.to_a
-      [background.first, background.last + statusbar_height]
+      [background.first, background.last]
     end
-
-    def statusbar_height; 20; end
 
     def configure_volume_icon
       if volume_icon
@@ -134,7 +132,7 @@ module ChocTop
            delay 5
         end tell
       SCRIPT
-      puts "script: #{script}"
+      puts "setting up volume images and icon placement..."
       run_applescript(script)
       system "SetFile -a V '#{target_background}'" if background_file
     end

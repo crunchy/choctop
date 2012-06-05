@@ -1,5 +1,7 @@
 module ChocTop
   module RakeTasks
+    include Rake::DSL
+
     def define_tasks
       return unless Object.const_defined?("Rake")
 
