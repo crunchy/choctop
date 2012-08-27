@@ -203,7 +203,8 @@ module ChocTop
 
     def add_file_to_dmg_src_folder(path, options)
       target = File.join(tmp_dmg_src_folder, options[:name])
-      system ::Escape.shell_command(['cp', '-r', path, target])
+      # Use -a    Same as -pPR options. Preserves structure and attributes of files but not directory structure.
+      system ::Escape.shell_command(['cp', '-a', path, target])
       if options[:exclude]
         exclude_list = options[:exclude].is_a?(Array) ? options[:exclude] : [options[:exclude].to_s]
         exclude_list.each { |exclude| system ::Escape.shell_command(['rm', '-rf', File.join(target, exclude)]) }
